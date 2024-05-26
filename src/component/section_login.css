@@ -1,0 +1,48 @@
+.mainContainer {
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+  }
+  
+  .titleContainer {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .inputContainer {
+    margin-bottom: 15px;
+  }
+  
+  .inputBox {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .errorLabel {
+    color: red;
+    font-size: 12px;
+  }
+  
+  .inputButton {
+    width: 40%;
+    padding: 10px;
+    background-color: #DBB3F2;
+    border: 2px solid #B68FD6; /* Added border */
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Added drop shadow */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .inputButton:hover {
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+  }
+  

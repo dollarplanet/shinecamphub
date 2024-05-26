@@ -1,0 +1,31 @@
+.loginContainer {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+  }
+  
+  .logoContainer {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+  
+  .loginContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    position: relative; /* Added to contain the logo absolutely positioned */
+  }
+  
+  .imageContainer img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .logoContainer img {
+    max-width: 400px; /* Adjust as needed */
+    height: auto;
+  }
+  

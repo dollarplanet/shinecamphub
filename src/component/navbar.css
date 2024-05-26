@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    font-family: "Roboto", sans-serif;
+  }
+  
+  .wrapper {
+    display: flex;
+    justify-content: space-between;
+    padding: 1%;
+    width: auto;
+    height: 80px;
+    background-color: white;
+    box-shadow: 0 7px 15px 0 rgba(0, 0, 0, 0.5);
+  }
+  
+  .ImgContainer {
+    display: flex;
+    justify-content: center; /* Meletakkan gambar di tengah secara horizontal */
+    align-items: center; /* Meletakkan gambar di tengah secara vertikal */
+  }
+  
+  .ImgContainer > .ImgContainer-2 {
+    margin-left: 10%;
+  }
+  
+  .Img {
+    width: 30%; /* Lebar foto mengikuti lebar container */
+    height: auto; /* Menyesuaikan tinggi sesuai rasio aspek foto */
+    max-width: 100%; /* Hindari foto melebihi lebar container */
+  }
+  
+  
+  @media screen and (max-width: 576px) {
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      padding: 1%;
+      width: auto;
+      height: 80px;
+      background-color: #FBEDFD;
+      box-shadow: 0 7px 15px 0 rgba(0, 0, 0, 0.5);
+    }
+  
+    .ImgContainer > .ImgContainer-2 {
+      margin-left: 10%;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      padding: 1%;
+      width: auto;
+      height: 80px;
+      background-color: #FBEDFD;
+    }
+  
+    .ImgContainer > .ImgContainer-2 {
+      margin-left: 10%;
+    }
+  }
+  
