@@ -1,3 +1,7 @@
+body {
+    background: #FDF7FE;
+}
+
 .loginContainer {
     display: flex;
     flex-direction: row;
@@ -20,7 +24,8 @@
   }
   
   .imageContainer img {
-    max-width: 100%;
+    max-width: 450px;
+    background-repeat: repeat;
     height: auto;
   }
   

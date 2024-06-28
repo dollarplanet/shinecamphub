@@ -11,6 +11,7 @@
     height: 80px;
     background-color: white;
     box-shadow: 0 7px 15px 0 rgba(0, 0, 0, 0.5);
+    align-items: center;
   }
   
   .ImgContainer {
@@ -22,9 +23,49 @@
   .ImgContainer > .ImgContainer-2 {
     margin-left: 10%;
   }
+
+  .search-input {
+    display: flex;
+    flex-direction: row;
+    width: 500px;
+    height: 30px;
+    border: 1px solid black; /* Menetapkan border pada container search-input */
+    padding: 0 10px; /* Tambahkan padding agar input tidak terlalu dekat dengan border */
+    border-radius: 5px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5); /* Menambahkan efek shadow */
+    align-items: center;
+    margin-left: -50px;
+  }
+  
+  .search-input input {
+    width: 100%; /* Mengisi ruang yang tersedia dalam container */
+    height: 100%; /* Sesuaikan tinggi input dengan tinggi container */
+    border: none; /* Hilangkan border dari input sendiri */
+    outline: none; /* Hilangkan outline saat input aktif */
+    padding: 0; /* Hilangkan padding untuk memastikan input sesuai dengan container */
+  }
+
+  .search-input img {
+    height: 20px;
+    width: 20px;
+    margin-right: 5px;
+  }
+
+  .btn-login {
+    height: 50px;
+    width: 200px;
+    border: none;
+    border-radius: 15px;
+    background-color: aliceblue;
+  }
+
+  .btn-login .Navlink{
+    text-decoration: none;
+    font-size: 16px;
+  }
   
   .Img {
-    width: 30%; /* Lebar foto mengikuti lebar container */
+    width: 50%; /* Lebar foto mengikuti lebar container */
     height: auto; /* Menyesuaikan tinggi sesuai rasio aspek foto */
     max-width: 100%; /* Hindari foto melebihi lebar container */
   }

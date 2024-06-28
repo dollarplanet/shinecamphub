@@ -1,9 +1,16 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom'; // import NavLink dari react-router-dom
-import "../component/Navbar.css";
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import "../component/navbar.css"
 import Logo from '../images/logo.png';
+import Search from '../images/search.png'
 
 const Navbar = ({ src, alt }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleInputChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div className="fContainer">
       <nav className="wrapper">
@@ -12,9 +19,15 @@ const Navbar = ({ src, alt }) => {
             <img src={Logo} alt={alt} className="Img" />
           </div>
         </div>
-        
-        <input className='search-input'/>
-
+        <div className='search-input'>
+          <img src={Search} alt='search' />
+          <input
+            type="text"
+            placeholder="Cari..."
+            value={searchQuery}
+            onChange={handleInputChange}
+          />
+        </div>
         <button className='btn-login'><NavLink to="/login" className="Navlink"><b>Login</b></NavLink></button>
       </nav>
     </div>

@@ -1,0 +1,22 @@
+/* component/buttonActions.css */
+.button-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full height of the viewport */
+  }
+  
+  .button-actions .button-group {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    width: 200px; /* Optional: Set a fixed width for better alignment */
+  }
+  
+  .button-actions .button-group button {
+    display: block;
+    margin: 5px 0;
+    width: 100%; /* Ensure buttons fill the container width */
+  }
+  

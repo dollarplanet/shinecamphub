@@ -1,0 +1,100 @@
+.sidebar {
+  width: 300px;
+  background-color: #fff;
+  color: #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  z-index: 1000; /* Pastikan sidebar berada di atas konten lainnya */
+}
+
+.sidebar.closed {
+  width: 125px; /* Lebar sidebar saat hanya ikon yang terlihat */
+  background-color: white;
+}
+
+.logo-container img {
+  height: 50px;
+  margin-top: 40px;
+  margin-left: 80px;
+  width: auto;
+}
+
+.sidebar-menu {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 40px; /* Margin untuk memberi ruang bagi tombol toggle */
+}
+
+.sidebar.closed .sidebar-menu {
+  margin-top: 135px; /* Margin untuk memberi ruang bagi tombol toggle */
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.sidebar-link {
+  color: #000;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-link-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-icon.active {
+  border: 2px solid #5E2089; /* Change this color to your preferred border color */
+  border-radius: 8px;
+  padding: 5px;
+  margin-left: 10px;
+}
+
+.sidebar-icon {
+  width: 40px;
+  height: 40px;
+  margin-top: 5px;
+  margin-left: 20px;
+  background-color: transparent;
+}
+
+.sidebar.closed .sidebar-icon {
+  margin-right: 0;
+}
+
+.sidebar-text {
+  display: inline;
+  margin-left: 20px;
+}
+
+.toggle-button {
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  position: absolute;
+  top: 40px;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  transition: left 0.3s ease;
+}
+
+.sidebar.open .toggle-button {
+  left: 40px; /* Adjust based on open sidebar width and button size */
+}
+
+.sidebar.closed .toggle-button {
+  left: 40px; /* Adjust based on closed sidebar width and button size */
+}
+

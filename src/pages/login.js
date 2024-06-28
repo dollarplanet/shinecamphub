@@ -1,5 +1,5 @@
 import React from "react";
-import SectionLogin from "../component/section_login"; // Ensure the correct path
+import SectionLogin from "../component/section_login";
 import photo from "../images/image_background_side.png";
 import photo2 from "../images/logo.png";
 import "./login.css"; // Assuming you have a CSS file for styling

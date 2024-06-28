@@ -1,0 +1,41 @@
+.barbox {
+    background-color: #DBB3F2;
+    border-radius: 10px;
+    width: 1185px;
+    height: 100px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: row;
+}
+
+.logo-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: white;
+}
+
+.logo-circle {
+    width: 50px;
+    height: 50px;
+}
+
+.logo-circle img {
+    width: 50px;
+    height: 50px;
+}
+
+.barbox img {
+    width: 50px;
+    height: 50px;
+}
+
+.logo-three-circle {
+    width: auto;
+    height: 50px;
+}
+.arrow {
+    margin-left: 50px;
+}

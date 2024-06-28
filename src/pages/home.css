@@ -1,0 +1,191 @@
+body {
+    background-color: #FBEDFD;
+}
+
+.main-content {
+    width: 85%;
+    margin-left: 125px;
+  }
+  
+  .intro {
+    background-color: #DBB3F2;
+    border-radius: 10px;
+    width: 1045px;
+    height: 350px;
+    text-align: center;
+    overflow: hidden; /* Menghilangkan bagian yang melebihi kotak */
+  }
+
+  .intro p {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+    color: #5E2089;
+}
+
+.flex-container-1 {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-container-2 {
+    margin-left: -20px;
+}
+
+.flex-container-2 .bg-hiasan {
+    margin-left: 20px;
+}
+
+.flex-container2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flex-container2 img {
+    width: 50px;
+    height: 50px;
+    margin-right: 20px;
+}
+
+.intro-hiasan {
+    flex-direction: row;
+    width: 1045px;
+    height: 200px;
+    display: flex;
+    position: relative;
+    overflow: hidden; /* Menyembunyikan konten yang melewati batas */
+}
+
+.intro-hiasan .intro-logo {
+    height: 150px;
+    width: 550px;
+    z-index: 10; /* Memastikan logo tetap di atas elemen lain */
+}
+
+.intro-hiasan .hiasan-1 {
+    background-repeat: repeat;
+    height: 280px;
+    position: absolute;
+    left: 625px;
+    bottom: 5px;
+    top: -15px;
+    width: auto;
+    mix-blend-mode: soft-light;
+    opacity: 1;
+    z-index: 5; /* Menentukan stacking order, lebih rendah dari .intro-logo */
+}
+
+.intro-hiasan .hiasan-2 {
+    background-repeat: repeat;
+    height: 220px;
+    left: 640px;
+    bottom: 5px;
+    position: absolute;
+    width: auto;
+    opacity: 1;
+    z-index: 1; /* Menentukan stacking order, lebih rendah dari .hiasan-1 dan .intro-logo */
+}
+
+.bg-hiasan {
+  height: 80px;
+  width: 250px;
+  background-size: contain; /* Sesuaikan pengaturan background sesuai kebutuhan */
+  background-repeat: no-repeat; /* Jika tidak ingin gambar berulang */
+}
+
+.bg-hiasan p {
+    padding-top: 20px;
+
+}
+
+  
+  .features {
+    display: flex;
+    margin: 20px 0;
+  }
+  
+  .feature-button {
+    background-color: white;
+    border: 1.5px solid black;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 220px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Menambahkan efek shadow */
+  }
+
+  .feature-button:hover {
+    background-color: #5E2089;
+    color: white;
+  }
+
+  .feature-button img {
+    width: 50px;
+    height: auto;
+    margin-right: 20px;
+  }
+  
+  .content {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .education, .news {
+    width: 100%;
+  }
+
+  .education .bg-hiasan {
+    margin-left: 250px;
+  }
+
+  .news .bg-hiasan {
+    margin-left: 250px;
+  }
+  
+  .education-content, .news-content {
+    display: flex;
+  }
+  
+  .content-box, .news-box {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: calc(50% - 10px);
+    text-align: center;
+    border: 1px solid black;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Menambahkan efek shadow */
+    margin: 10px;
+  }
+
+  .btn-content{
+    border-radius: 25px;
+    border: none;
+    height: 25px;
+    width: 150px;
+    background-color: #DBB3F2;
+    color: #5E2089;
+    margin-top: 20px;
+  }
+  
+  .contact {
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .social-media {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    margin-top: 10px;
+  }
