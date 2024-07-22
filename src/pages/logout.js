@@ -3,11 +3,11 @@ import './room_chat.css';
 import Sidebar from '../component/sidebar';
 import Navbar from '../component/navbar';
 import Barbox from '../component/barbox';
-import BahasaOptionNI from '../component/bahasaOptionNI';
+import OptionsLogout from '../component/optionLogout';
 
 const ForumChat = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [title] = useState('Membership');
+  const [title] = useState('Log-Out');
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -19,7 +19,7 @@ const ForumChat = () => {
       <div style={{ flexGrow: 1 }}>
         <Navbar />
         <Barbox title={title}/>
-        <BahasaOptionNI/>
+        <OptionsLogout/>
       </div>
     </div>
   );

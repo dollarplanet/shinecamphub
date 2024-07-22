@@ -8,6 +8,7 @@
     justify-content: space-between;
     padding: 1%;
     width: auto;
+    margin-left: 90px;
     height: 80px;
     background-color: white;
     box-shadow: 0 7px 15px 0 rgba(0, 0, 0, 0.5);
@@ -34,7 +35,7 @@
     border-radius: 5px;
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5); /* Menambahkan efek shadow */
     align-items: center;
-    margin-left: -50px;
+    margin-right: 80px;
   }
   
   .search-input input {

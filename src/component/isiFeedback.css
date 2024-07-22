@@ -1,0 +1,100 @@
+.isiFeedbackContainer {
+    background-color: #f3e5f5; /* Light purple background */
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%; /* Full width */
+    max-width: 1200px; /* Maximum width to ensure readability on larger screens */
+    margin: 20px auto; /* Centered with some top and bottom margin */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+}
+
+.isiFeedbackContainer h2 {
+    color: #6a1b9a; /* Dark purple for heading */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.feedbackRatingRow {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px; /* Add some space between the textarea and the rating */
+}
+
+.isiFeedbackContainer textarea {
+    width: 60%; /* 60% of the parent container */
+    height: 120px; /* Adjusted height */
+    padding: 10px;
+    margin-left: 140px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+    font-size: 14px;
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+}
+
+.rating {
+    width: 35%; /* 35% of the parent container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+}
+
+.rating p {
+    margin: 0 0 10px 0; /* Add space below the title */
+    text-align: center;
+}
+
+.ratingOptions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.ratingLabel {
+    text-align: center;
+    cursor: pointer;
+}
+
+.ratingOptions input {
+    display: none;
+}
+
+.ratingOptions .ratingIcon {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.ratingOptions .ratingIcon:hover,
+.ratingOptions input:checked + .ratingIcon {
+    color: #6a1b9a; /* Dark purple when selected or hovered */
+}
+
+.isiFeedbackContainer button {
+    margin-top: 20px;
+    width: 100px; /* Adjusted width */
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #8e24aa; /* Purple button */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    align-self: center;
+}
+
+.isiFeedbackContainer button:disabled {
+    background-color: #ddd; /* Grey background when disabled */
+    cursor: not-allowed;
+}
+

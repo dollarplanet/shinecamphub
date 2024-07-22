@@ -1,0 +1,48 @@
+.options-logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 50px);
+    background-color: #f4f4f4;
+  }
+  
+  .logout-dialog {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logout-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+  
+  .logout-text {
+    margin-bottom: 20px;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .cancel-button, .confirm-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cancel-button {
+    background-color: #d6a2e8;
+    color: #fff;
+  }
+  
+  .confirm-button {
+    background-color: #d6a2e8;
+    color: #fff;
+  }
+  

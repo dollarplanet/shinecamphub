@@ -3,11 +3,12 @@ import './room_chat.css';
 import Sidebar from '../component/sidebar';
 import Navbar from '../component/navbar';
 import Barbox from '../component/barbox';
-import BahasaOptionNI from '../component/bahasaOptionNI';
+import QuestionForm from '../component/questionForm';
+import ContactInfo from '../component/contactInfo';
 
-const ForumChat = () => {
+const PusatBantuan = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [title] = useState('Membership');
+  const [title] = useState('Pusat Bantuan');
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -19,9 +20,10 @@ const ForumChat = () => {
       <div style={{ flexGrow: 1 }}>
         <Navbar />
         <Barbox title={title}/>
-        <BahasaOptionNI/>
+        <QuestionForm/>
+        <ContactInfo/>
       </div>
     </div>
   );
 };
-export default ForumChat;
+export default PusatBantuan;

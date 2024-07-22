@@ -1,0 +1,79 @@
+/* HasilFeedback.css */
+.hasilFeedbackContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f3e5f5; /* Light purple background */
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+.commentsSection, .statsSection {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.commentsSection h2, .statsSection h2 {
+    color: #6a1b9a; /* Dark purple for heading */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.hasilFeedbackComment .comment {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 2px solid #6a1b9a; /* Dark purple border */
+}
+
+.hasilFeedbackComment .comment p {
+    margin: 5px 0;
+}
+
+.hasilFeedbackClickEmote .stat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.hasilFeedbackClickEmote .stat p {
+    margin: 0 10px;
+    font-size: 16px;
+    flex: 1;
+}
+
+.hasilFeedbackClickEmote .progress {
+    flex: 3;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    height: 20px;
+}
+
+.hasilFeedbackClickEmote .progress-bar {
+    height: 100%;
+    background-color: #8e24aa; /* Purple progress bar */
+}
+
+@media (max-width: 768px) {
+    .hasilFeedbackContainer {
+        padding: 10px;
+    }
+
+    .commentsSection, .statsSection {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .hasilFeedbackClickEmote .stat p {
+        font-size: 14px;
+    }
+}

@@ -1,0 +1,68 @@
+/* Language Selection Container */
+.language-selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #6a5acd;
+  padding: 20px;
+  width: fit-content;
+  margin: auto;
+  background-color: #f0f0f0;
+}
+
+/* Language Buttons */
+.language-button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #6a5acd;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 250px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.language-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Membership Form Container */
+.membership-form-container {
+  margin-top: 20px;
+  text-align: center;
+  border: 1px solid #6a5acd;
+  padding: 20px;
+  background-color: #fff;
+  width: fit-content;
+  margin: auto;
+}
+
+/* Membership Form Table */
+.membership-form-table {
+  width: 100%;
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+.membership-form-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Save Button */
+.save-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #6a5acd;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  font-size: 16px;
+}
+
+.save-button:hover {
+  background-color: #483d8b;
+}
