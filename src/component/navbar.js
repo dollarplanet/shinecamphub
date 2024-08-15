@@ -7,7 +7,7 @@ import DefaultAvatar from '../images/Group.png';
 import { useAuth } from '../component/AuthContent'; 
 
 const Navbar = () => {
-  const { user, isLoggedIn } = useAuth();
+  const { user, healer, isLoggedIn } = useAuth(); // Assuming useAuth provides healer details as well
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleInputChange = (event) => {
@@ -41,7 +41,11 @@ const Navbar = () => {
                 alt="Profile"
                 className="profile-picture"
               />
-              <span className="username">{user.username}</span>
+              {user ? (
+                <span className="username">{user.username}</span>
+              ) : healer ? (
+                <span className="username">{healer.username}</span>
+              ) : null}
             </div>
           ) : (
             <button className='btn-login'>
@@ -64,5 +68,6 @@ function debounce(func, wait) {
 }
 
 export default Navbar;
+
 
 

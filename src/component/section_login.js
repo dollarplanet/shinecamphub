@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./section_login.css";
 
-Modal.setAppElement('#root'); 
+Modal.setAppElement('#root');
 
-const SectionLogin = ({ setLoggedIn, setEmail, setUserId }) => {
+const SectionLogin = ({ setLoggedIn, setEmail, setUserId, setHealerId }) => {
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -85,13 +85,18 @@ const SectionLogin = ({ setLoggedIn, setEmail, setUserId }) => {
     try {
       // Send login request to backend
       const response = await axios.post('http://localhost:3003/login', { email, password });
-      console.log('Response:', response);
 
       if (response.status === 200) {
         // On successful login
         setLoggedIn(true);
         setEmail(response.data.email);
-        setUserId(response.data.userId);
+
+        // Check if the response contains user or healer data
+        if (response.data.userId) {
+          setUserId(response.data.userId);
+        } else if (response.data.healerId) {
+          setHealerId(response.data.healerId);
+        }
 
         // Save the token in localStorage with a specific name
         localStorage.setItem('shinecampus_token', response.data.token);
@@ -160,6 +165,7 @@ const SectionLogin = ({ setLoggedIn, setEmail, setUserId }) => {
 };
 
 export default SectionLogin;
+
 
 
 

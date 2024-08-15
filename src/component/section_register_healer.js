@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./section_login.css";
 
-const SectionRegister = ({ setLoggedIn, setEmail, setHealerId }) => {
+const SectionRegister = () => {
   const [username, setUsername] = useState('');
   const [email, setEmailState] = useState('');
   const [password, setPassword] = useState('');
@@ -53,10 +53,8 @@ const SectionRegister = ({ setLoggedIn, setEmail, setHealerId }) => {
         const response = await axios.post('http://localhost:3003/register/healer', { username, email, password });
 
         if (response.status === 200) {
-          setLoggedIn(true);
-          setEmail(email);
-          setHealerId(response.data.healerId); // Assuming the API returns `healerId`
-          navigate('/home');
+          // Navigate to login page after successful registration
+          navigate('/login');
         }
       } catch (error) {
         setError('Registration failed');
@@ -111,5 +109,6 @@ const SectionRegister = ({ setLoggedIn, setEmail, setHealerId }) => {
 };
 
 export default SectionRegister;
+
 
 

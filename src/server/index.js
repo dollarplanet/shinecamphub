@@ -272,56 +272,181 @@ app.delete('/user', verifyToken, async (req, res) => {
   }
 });
 
-// Route to handle /login/login-berhasil and save data
-app.post('/login/login-berhasil', verifyToken, async (req, res) => {
+// GET /healer - Get healer details using the JWT token
+app.get('/healer', verifyToken, async (req, res) => {
   try {
-    // Get user ID from the decoded token
-    const userId = req.user.userId;
+    // Get healer ID from the decoded token
+    const healerId = req.user.healerId;
 
-    // Query to get user details from the database
-    const result = await pool.query('SELECT * FROM users WHERE id_user = $1', [userId]);
+    // Query to get healer details from the database
+    const result = await pool.query('SELECT id_healer, username, email FROM healer WHERE id_healer = $1', [healerId]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Healer not found' });
     }
 
-    const user = result.rows[0];
+    const healer = result.rows[0];
 
-    // Logic to save data based on the user details
-    await pool.query('UPDATE users SET last_login = NOW() WHERE id_user = $1', [userId]);
-
-    // Send a success response with user details
+    // Send a success response with healer details
     res.json({
-      message: 'Data saved successfully',
-      user: {
-        id_user: user.id_user,
-        username: user.username,
-        email: user.email,
+      healer: {
+        id_healer: healer.id_healer,
+        username: healer.username,
+        email: healer.email,
       },
     });
   } catch (error) {
-    console.error('Error saving data:', error);
-    res.status(500).json({ error: 'Failed to save data' });
+    console.error('Error fetching healer details:', error);
+    res.status(500).json({ error: 'Failed to fetch healer details' });
   }
 });
 
-// Route to handle logout (optional, for additional cleanup or session management)
-app.post('/logout', (req, res) => {
-  res.json({ message: 'Logout successful' });
+// PUT /healer - Update healer information
+app.put('/healer', verifyToken, async (req, res) => {
+  const { username, email } = req.body;
+  const healerId = req.user.healerId;
+
+  try {
+    // Update healer details in the database
+    const result = await pool.query(
+      'UPDATE healer SET username = $1, email = $2 WHERE id_healer = $3 RETURNING id_healer, username, email',
+      [username, email, healerId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Healer not found' });
+    }
+
+    const healer = result.rows[0];
+
+    // Send a success response with updated healer details
+    res.json({
+      message: 'Healer information updated successfully',
+      healer: {
+        id_healer: healer.id_healer,
+        username: healer.username,
+        email: healer.email,
+      },
+    });
+  } catch (error) {
+    console.error('Error updating healer details:', error);
+    res.status(500).json({ error: 'Failed to update healer details' });
+  }
 });
 
-// Basic Socket.IO setup
-io.on('connection', (socket) => {
-  console.log('a user connected');
+// DELETE /healer - Delete healer account
+app.delete('/healer', verifyToken, async (req, res) => {
+  const healerId = req.user.healerId;
 
-  // Handle user logout event
-  socket.on('logout', () => {
-    console.log('user logged out');
-    socket.disconnect();
+  try {
+    // Delete healer from the database
+    const result = await pool.query('DELETE FROM healer WHERE id_healer = $1 RETURNING id_healer', [healerId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Healer not found' });
+    }
+
+    // Send a success response
+    res.json({
+      message: 'Healer account deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting healer account:', error);
+    res.status(500).json({ error: 'Failed to delete healer account' });
+  }
+});
+
+// Route to send a message from either a user or a healer
+app.post('/send-message', verifyToken, async (req, res) => {
+  const { senderType, receiverId, receiverType, messageText } = req.body;
+  const senderId = senderType === 'user' ? req.user.userId : req.user.healerId;
+
+  try {
+    // Insert message into the database
+    const result = await pool.query(
+      `INSERT INTO messages (sender_id, sender_type, receiver_id, receiver_type, message_text, timestamp)
+       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id_message`,
+      [senderId, senderType, receiverId, receiverType, messageText]
+    );
+
+    const messageId = result.rows[0].id_messages;
+
+    // Emit the message to the receiver via Socket.IO
+    io.to(receiverId).emit('messages', {
+      id: messageId,
+      sender_id: senderId,
+      sender_type: senderType,
+      receiver_id: receiverId,
+      receiver_type: receiverType,
+      message_text: messageText,
+      timestamp: new Date(),
+    });
+
+    // Send success response with message ID
+    res.status(200).json({ messageId });
+  } catch (error) {
+    console.error('Message sending failed:', error);
+    res.status(500).json({ error: 'Message sending failed' });
+  }
+});
+
+// Route to retrieve messages between a user and healer
+app.get('/messages', verifyToken, async (req, res) => {
+  const { withId, withType } = req.query;
+  const userId = req.user.userId || null;
+  const healerId = req.user.healerId || null;
+
+  try {
+    // Query to get messages involving the current user/healer and the specified user/healer
+    const result = await pool.query(
+      `SELECT * FROM messages 
+       WHERE 
+         (sender_id = $1 AND sender_type = $2 AND receiver_id = $3 AND receiver_type = $4) 
+       OR 
+         (sender_id = $3 AND sender_type = $4 AND receiver_id = $1 AND receiver_type = $2)
+       ORDER BY timestamp ASC`,
+      [userId || healerId, userId ? 'user' : 'healer', withId, withType]
+    );
+
+    const messages = result.rows;
+
+    // Send the retrieved messages
+    res.json({ messages });
+  } catch (error) {
+    console.error('Failed to retrieve messages:', error);
+    res.status(500).json({ error: 'Failed to retrieve messages' });
+  }
+});
+
+// Handle Socket.IO connections
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('messages', async ({ text, to, from }) => {
+    try {
+      const senderType = from.startsWith('user') ? 'user' : 'healer';
+      const receiverType = to.startsWith('user') ? 'user' : 'healer';
+      const senderId = parseInt(from.replace(/\D/g, ''), 10);
+      const receiverId = parseInt(to.replace(/\D/g, ''), 10);
+
+      // Store message in the database
+      const result = await pool.query(
+        `INSERT INTO messages (sender_id, sender_type, receiver_id, receiver_type, message_text, timestamp)
+         VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id_message`,
+        [senderId, senderType, receiverId, receiverType, text]
+      );
+
+      const messageId = result.rows[0].id_message;
+
+      // Emit the message to the recipient
+      io.to(to).emit('message', { id: messageId, text, from, timestamp: new Date() });
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log('User disconnected:', socket.id);
   });
 });
 
@@ -330,4 +455,3 @@ const PORT = process.env.PORT || 3003;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-

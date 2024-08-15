@@ -19,14 +19,15 @@ import './App.css'; // Assuming you have some global CSS for your app
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
-  const [userId, setUserId] = useState(''); // Add userId state
+  const [userId, setUserId] = useState('');
+  const [healerId, setHealerId] = useState(''); // Add userId state
 
   return (
     <div className="App">
       <Router>
         <Routes>
           <Route path="/" element={<Home email={email} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} />
-          <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} setUserId={setUserId} />} />
+          <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} setUserId={setUserId} setHealerId={setHealerId} />} />
           <Route path="/register_user" element={<RegisterUser />} />
           <Route path="/register_healer" element={<RegisterHealer />} />
           <Route path="/login/login-berhasil" element={<LoginB />} />
