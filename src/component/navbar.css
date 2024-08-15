@@ -52,6 +52,27 @@
     margin-right: 5px;
   }
 
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-picture {
+    height: 5px;
+    width: 5px;
+    margin-right: 10px;
+  }
+  
+  .username {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
   .btn-login {
     height: 50px;
     width: 200px;
@@ -86,6 +107,15 @@
     .ImgContainer > .ImgContainer-2 {
       margin-left: 10%;
     }
+
+    .profile-picture {
+      height: 35px;
+      width: 35px;
+    }
+  
+    .username {
+      font-size: 14px;
+    }
   }
   
   @media screen and (max-width: 768px) {
@@ -100,6 +130,15 @@
   
     .ImgContainer > .ImgContainer-2 {
       margin-left: 10%;
+    }
+
+    .profile-picture {
+      height: 30px;
+      width: 30px;
+    }
+  
+    .username {
+      font-size: 12px;
     }
   }
   

@@ -1,15 +1,21 @@
 import React from 'react';
 import './optonLogout.css';
+import { useAuth } from '../component/AuthContent'; // Import useAuth for logout
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const OptionsLogout = () => {
+  const { logout } = useAuth(); // Get the logout function from AuthContext
+  const navigate = useNavigate(); // Get the navigate function
+
   const handleCancel = () => {
     // Navigate back to settings page
-    window.location.pathname = '/setting';
+    navigate('/setting');
   };
 
   const handleConfirm = () => {
-    // Navigate to login page
-    window.location.pathname = '/login';
+    // Call logout function and navigate to login page
+    logout(); // Perform the logout action
+    navigate('/login'); // Redirect to the login page
   };
 
   return (
