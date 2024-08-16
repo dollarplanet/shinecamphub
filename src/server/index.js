@@ -1,4 +1,3 @@
-// Import dependencies
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
@@ -10,12 +9,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 
-// Initialize Express app
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Create an HTTP server and wrap it with Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -23,7 +20,6 @@ const io = new Server(server, {
   },
 });
 
-// Set up PostgreSQL connection
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -32,17 +28,15 @@ const pool = new Pool({
   port: process.env.DB_PORT || 5432,
 });
 
-// JWT secret key from environment variable
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
-// Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const token = req.headers['authorization']?.split(' ')[1]; // Extract token correctly
 
   if (!token) {
     return res.status(401).json({ error: 'Access denied, token missing!' });
   } else {
-    jwt.verify(token.split(' ')[1], JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
       if (err) {
         return res.status(401).json({ error: 'Token invalid!' });
       } else {
@@ -53,17 +47,51 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Set up multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
 });
 
-// Route to handle healer registration
+app.post('/register', upload.single('studentProof'), async (req, res) => {
+  const { username, email, password, campusName } = req.body;
+  const studentProof = req.file ? req.file.buffer : null;
+
+  try {
+    // Check if email or username already exists
+    const emailCheck = await pool.query('SELECT id_user FROM users WHERE email = $1', [email]);
+    const usernameCheck = await pool.query('SELECT id_user FROM users WHERE username = $1', [username]);
+    
+    if (emailCheck.rows.length > 0) {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+
+    if (usernameCheck.rows.length > 0) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    // Hash the password before saving it to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert user data into the database
+    const result = await pool.query(
+      `INSERT INTO users (username, password, email, nama_kampus, upload_bukti_mahasiswa_aktif) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING id_user`,
+      [username, hashedPassword, email, campusName, studentProof]
+    );
+
+    const userId = result.rows[0].id_user;
+
+    // Send success response
+    res.status(200).json({ userId });
+  } catch (error) {
+    console.error('Registration failed:', error);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
 app.post('/register/healer', async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if username or email already exists in the healer table
     const usernameCheck = await pool.query('SELECT id_healer FROM healer WHERE username = $1', [username]);
     const emailCheck = await pool.query('SELECT id_healer FROM healer WHERE email = $1', [email]);
 
@@ -75,15 +103,12 @@ app.post('/register/healer', async (req, res) => {
       return res.status(400).json({ error: 'Email already exists' });
     }
 
-    // Ensure the email is not null
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert healer data into the database
     const result = await pool.query(
       `INSERT INTO healer (username, email, password) 
        VALUES ($1, $2, $3) RETURNING id_healer`,
@@ -92,7 +117,6 @@ app.post('/register/healer', async (req, res) => {
 
     const healerId = result.rows[0].id_healer;
 
-    // Send success response
     res.status(200).json({ healerId });
   } catch (error) {
     console.error('Healer registration failed:', error);
@@ -100,23 +124,19 @@ app.post('/register/healer', async (req, res) => {
   }
 });
 
-// Unified login route for both users and healers
 app.post('/login', async (req, res) => {
   const { email, username, password } = req.body;
 
   try {
-    // Query to get user details from the users table
     let result = await pool.query('SELECT id_user, username, password FROM users WHERE email = $1', [email]);
 
     if (result.rows.length === 0) {
-      // If no user found, check the healer table
       result = await pool.query('SELECT id_healer, username, password FROM healer WHERE email = $1', [email]);
 
       if (result.rows.length === 0) {
         return res.status(400).json({ error: 'Invalid email or password' });
       }
 
-      // Validate healer's password
       const healer = result.rows[0];
       const isPasswordValid = await bcrypt.compare(password, healer.password);
 
@@ -124,17 +144,15 @@ app.post('/login', async (req, res) => {
         return res.status(400).json({ error: 'Invalid password' });
       }
 
-      // Create token for healer
       const token = jwt.sign(
         {
           healerId: healer.id_healer,
           username: healer.username,
         },
         JWT_SECRET,
-        { expiresIn: '4h' } // Set token expiration to 4 hours
+        { expiresIn: '4h' }
       );
 
-      // Send response with healer details and token
       return res.json({
         message: 'Login successful',
         token: token,
@@ -144,7 +162,6 @@ app.post('/login', async (req, res) => {
         },
       });
     } else {
-      // Validate user's password
       const user = result.rows[0];
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -152,17 +169,15 @@ app.post('/login', async (req, res) => {
         return res.status(400).json({ error: 'Invalid password' });
       }
 
-      // Create token for user
       const token = jwt.sign(
         {
           userId: user.id_user,
           username: user.username,
         },
         JWT_SECRET,
-        { expiresIn: '4h' } // Set token expiration to 4 hours
+        { expiresIn: '4h' }
       );
 
-      // Send response with user details and token
       return res.json({
         message: 'Login successful',
         token: token,
@@ -178,23 +193,29 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Route to verify token
-app.get('/verify-token', verifyToken, (req, res) => {
+// Verify and get user or healer details
+app.get('/verify-token', verifyToken, async (req, res) => {
   try {
-    res.json({ user: req.user });
+    if (req.user.userId) {
+      const result = await pool.query('SELECT username FROM users WHERE id_user = $1', [req.user.userId]);
+      return res.json({ user: result.rows[0] });
+    } else if (req.user.healerId) {
+      const result = await pool.query('SELECT username FROM healer WHERE id_healer = $1', [req.user.healerId]);
+      return res.json({ healer: result.rows[0] });
+    } else {
+      return res.status(404).json({ error: 'User or Healer not found' });
+    }
   } catch (error) {
     console.error('Token verification failed:', error);
     res.status(500).json({ error: 'Token verification failed' });
   }
 });
 
-// GET /user - Get user details using the JWT token
+
 app.get('/user', verifyToken, async (req, res) => {
   try {
-    // Get user ID from the decoded token
     const userId = req.user.userId;
 
-    // Query to get user details from the database
     const result = await pool.query('SELECT id_user, username, email FROM users WHERE id_user = $1', [userId]);
 
     if (result.rows.length === 0) {
@@ -203,7 +224,6 @@ app.get('/user', verifyToken, async (req, res) => {
 
     const user = result.rows[0];
 
-    // Send a success response with user details
     res.json({
       user: {
         id_user: user.id_user,
@@ -217,13 +237,11 @@ app.get('/user', verifyToken, async (req, res) => {
   }
 });
 
-// PUT /user - Update user information
 app.put('/user', verifyToken, async (req, res) => {
   const { username, email } = req.body;
   const userId = req.user.userId;
 
   try {
-    // Update user details in the database
     const result = await pool.query(
       'UPDATE users SET username = $1, email = $2 WHERE id_user = $3 RETURNING id_user, username, email',
       [username, email, userId]
@@ -235,7 +253,6 @@ app.put('/user', verifyToken, async (req, res) => {
 
     const user = result.rows[0];
 
-    // Send a success response with updated user details
     res.json({
       message: 'User information updated successfully',
       user: {
@@ -250,19 +267,16 @@ app.put('/user', verifyToken, async (req, res) => {
   }
 });
 
-// DELETE /user - Delete user account
 app.delete('/user', verifyToken, async (req, res) => {
   const userId = req.user.userId;
 
   try {
-    // Delete user from the database
     const result = await pool.query('DELETE FROM users WHERE id_user = $1 RETURNING id_user', [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Send a success response
     res.json({
       message: 'User account deleted successfully',
     });
@@ -272,13 +286,10 @@ app.delete('/user', verifyToken, async (req, res) => {
   }
 });
 
-// GET /healer - Get healer details using the JWT token
 app.get('/healer', verifyToken, async (req, res) => {
   try {
-    // Get healer ID from the decoded token
     const healerId = req.user.healerId;
 
-    // Query to get healer details from the database
     const result = await pool.query('SELECT id_healer, username, email FROM healer WHERE id_healer = $1', [healerId]);
 
     if (result.rows.length === 0) {
@@ -287,7 +298,6 @@ app.get('/healer', verifyToken, async (req, res) => {
 
     const healer = result.rows[0];
 
-    // Send a success response with healer details
     res.json({
       healer: {
         id_healer: healer.id_healer,
@@ -301,13 +311,11 @@ app.get('/healer', verifyToken, async (req, res) => {
   }
 });
 
-// PUT /healer - Update healer information
 app.put('/healer', verifyToken, async (req, res) => {
   const { username, email } = req.body;
   const healerId = req.user.healerId;
 
   try {
-    // Update healer details in the database
     const result = await pool.query(
       'UPDATE healer SET username = $1, email = $2 WHERE id_healer = $3 RETURNING id_healer, username, email',
       [username, email, healerId]
@@ -319,7 +327,6 @@ app.put('/healer', verifyToken, async (req, res) => {
 
     const healer = result.rows[0];
 
-    // Send a success response with updated healer details
     res.json({
       message: 'Healer information updated successfully',
       healer: {
@@ -334,19 +341,16 @@ app.put('/healer', verifyToken, async (req, res) => {
   }
 });
 
-// DELETE /healer - Delete healer account
 app.delete('/healer', verifyToken, async (req, res) => {
   const healerId = req.user.healerId;
 
   try {
-    // Delete healer from the database
     const result = await pool.query('DELETE FROM healer WHERE id_healer = $1 RETURNING id_healer', [healerId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Healer not found' });
     }
 
-    // Send a success response
     res.json({
       message: 'Healer account deleted successfully',
     });
@@ -356,61 +360,43 @@ app.delete('/healer', verifyToken, async (req, res) => {
   }
 });
 
-// Route to send a message from either a user or a healer
-app.post('/send-message', verifyToken, async (req, res) => {
-  const { senderType, receiverId, receiverType, messageText } = req.body;
-  const senderId = senderType === 'user' ? req.user.userId : req.user.healerId;
+const isUserOrHealer = async (name) => {
+  const userCheck = await pool.query('SELECT id_user FROM users WHERE username = $1', [name]);
+  if (userCheck.rows.length > 0) return { id: userCheck.rows[0].id_user, isUser: true };
 
-  try {
-    // Insert message into the database
-    const result = await pool.query(
-      `INSERT INTO messages (sender_id, sender_type, receiver_id, receiver_type, message_text, timestamp)
-       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id_message`,
-      [senderId, senderType, receiverId, receiverType, messageText]
-    );
+  const healerCheck = await pool.query('SELECT id_healer FROM healer WHERE username = $1', [name]);
+  if (healerCheck.rows.length > 0) return { id: healerCheck.rows[0].id_healer, isUser: false };
 
-    const messageId = result.rows[0].id_messages;
+  return null;
+};
 
-    // Emit the message to the receiver via Socket.IO
-    io.to(receiverId).emit('messages', {
-      id: messageId,
-      sender_id: senderId,
-      sender_type: senderType,
-      receiver_id: receiverId,
-      receiver_type: receiverType,
-      message_text: messageText,
-      timestamp: new Date(),
-    });
-
-    // Send success response with message ID
-    res.status(200).json({ messageId });
-  } catch (error) {
-    console.error('Message sending failed:', error);
-    res.status(500).json({ error: 'Message sending failed' });
-  }
-});
-
-// Route to retrieve messages between a user and healer
+// Fetch messages between user and healer
 app.get('/messages', verifyToken, async (req, res) => {
-  const { withId, withType } = req.query;
-  const userId = req.user.userId || null;
-  const healerId = req.user.healerId || null;
+  const { withName } = req.query;
+  const senderName = req.user.username;
 
   try {
-    // Query to get messages involving the current user/healer and the specified user/healer
+    if (!withName) {
+      return res.status(400).json({ error: 'Recipient name is missing in the query parameter' });
+    }
+
+    const recipient = await isUserOrHealer(withName);
+
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient not found' });
+    }
+
     const result = await pool.query(
       `SELECT * FROM messages 
        WHERE 
-         (sender_id = $1 AND sender_type = $2 AND receiver_id = $3 AND receiver_type = $4) 
+         (sender_name = $1 AND receiver_name = $2) 
        OR 
-         (sender_id = $3 AND sender_type = $4 AND receiver_id = $1 AND receiver_type = $2)
+         (sender_name = $2 AND receiver_name = $1)
        ORDER BY timestamp ASC`,
-      [userId || healerId, userId ? 'user' : 'healer', withId, withType]
+      [senderName, withName]
     );
 
     const messages = result.rows;
-
-    // Send the retrieved messages
     res.json({ messages });
   } catch (error) {
     console.error('Failed to retrieve messages:', error);
@@ -418,30 +404,97 @@ app.get('/messages', verifyToken, async (req, res) => {
   }
 });
 
-// Handle Socket.IO connections
+// Send message between user and healer
+app.post('/send-message', verifyToken, async (req, res) => {
+  const { receiverName, messageText, receiverType } = req.body;
+  const senderName = req.user.username;
+
+  // Validate input data
+  if (!senderName || !receiverName || !messageText || !receiverType) {
+    return res.status(400).json({ error: 'Invalid input data' });
+  }
+
+  // Ensure receiverType is either 'user' or 'healer'
+  if (receiverType !== 'user' && receiverType !== 'healer') {
+    return res.status(400).json({ error: 'Invalid receiver type' });
+  }
+
+  try {
+    // Check if recipient exists and get recipient type
+    const recipient = await isUserOrHealer(receiverName);
+
+    if (!recipient) {
+      return res.status(404).json({ error: 'Recipient not found' });
+    }
+
+    // Ensure that sender and receiver are not of the same type
+    if (req.user.userId && recipient.isUser) {
+      return res.status(400).json({ error: 'Cannot send message to another user as a user.' });
+    }
+
+    if (req.user.healerId && !recipient.isUser) {
+      return res.status(400).json({ error: 'Cannot send message to another healer as a healer.' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO messages (sender_name, receiver_name, message_text, timestamp, receiver_type)
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP, $4) RETURNING id_message`,
+      [senderName, receiverName, messageText, receiverType]
+    );
+
+    console.log('Message saved:', result.rows[0].id_message);
+
+    // Emit the message to the receiver using Socket.IO
+    io.to(receiverName).emit('message', {
+      id_message: result.rows[0].id_message,
+      sender_name: senderName,
+      receiver_name: receiverName,
+      message_text: messageText,
+      timestamp: new Date(),
+      receiver_type: receiverType,
+    });
+
+    res.status(200).json({ messageId: result.rows[0].id_message });
+  } catch (error) {
+    console.error('Error details:', error);
+    res.status(500).json({ error: 'Message sending failed due to database issue.' });
+  }
+});
+
+
+// Socket.IO connection
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  socket.on('messages', async ({ text, to, from }) => {
+  // Handle message sending through Socket.IO
+  socket.on('message', async ({ text, to, from, receiverType }) => {  // Tambahkan receiverType
     try {
-      const senderType = from.startsWith('user') ? 'user' : 'healer';
-      const receiverType = to.startsWith('user') ? 'user' : 'healer';
-      const senderId = parseInt(from.replace(/\D/g, ''), 10);
-      const receiverId = parseInt(to.replace(/\D/g, ''), 10);
+      // Ensure receiverType is either 'user' or 'healer'
+      if (receiverType !== 'user' && receiverType !== 'healer') {
+        socket.emit('error', { message: 'Invalid receiver type' });
+        return;
+      }
 
-      // Store message in the database
       const result = await pool.query(
-        `INSERT INTO messages (sender_id, sender_type, receiver_id, receiver_type, message_text, timestamp)
-         VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id_message`,
-        [senderId, senderType, receiverId, receiverType, text]
+        `INSERT INTO messages (sender_name, receiver_name, message_text, timestamp, receiver_type)
+         VALUES ($1, $2, $3, CURRENT_TIMESTAMP, $4) RETURNING id_message`,  // Tambahkan receiverType
+        [from, to, text, receiverType]
       );
 
-      const messageId = result.rows[0].id_message;
+      console.log('Message saved via socket:', result.rows[0].id_message);
 
-      // Emit the message to the recipient
-      io.to(to).emit('message', { id: messageId, text, from, timestamp: new Date() });
+      // Emit the message to the receiver
+      io.to(to).emit('message', {
+        id_message: result.rows[0].id_message,
+        sender_name: from,
+        receiver_name: to,
+        message_text: text,
+        timestamp: new Date(),
+        receiver_type: receiverType,  // Sertakan receiverType
+      });
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error sending message via socket:', error);
+      socket.emit('error', { message: 'Failed to send message. Please try again later.' });
     }
   });
 
@@ -450,7 +503,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Start the server on port 3003
 const PORT = process.env.PORT || 3003;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

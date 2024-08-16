@@ -110,7 +110,7 @@ const SectionRegister = ({ setLoggedIn, setEmail, setUserId, setRegister }) => {
         if (error.response && error.response.data) {
           setError(error.response.data.error);
         } else {
-          setError('Registration failed. Please try again.');
+          setTimeout(() => navigate('/login'), 2000);
         }
       }
     }

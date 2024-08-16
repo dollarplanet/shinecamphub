@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import io from 'socket.io-client';
+import axios from 'axios';
 
 // Initialize socket connection to the backend
 const socket = io('http://localhost:3003'); // Adjust the URL as needed
@@ -67,89 +68,140 @@ const IconButton = styled.button`
   }
 `;
 
-const ChatComponent = ({ userId, userType }) => {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [connectedUser, setConnectedUser] = useState(null);
+const ErrorMessage = styled.div`
+  color: red;
+  text-align: center;
+  margin-bottom: 10px;
+`;
 
-  const fetchMessages = async (connectedUserId, connectedUserType) => {
+const ChatComponent = () => {
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [userName, setUserName] = useState(''); // Store the username of the logged-in user
+  const [withName, setWithName] = useState(''); // Store the recipient's name
+  const [receiverType, setReceiverType] = useState('user');  // Default to 'user'
+
+  // Fetch logged-in user data from the backend
+  const fetchUserData = async () => {
     try {
-      const response = await fetch(`http://localhost:3003/messages?withId=${connectedUserId}&withType=${connectedUserType}`, {
+      console.log("Fetching user data...");
+      const response = await axios.get('http://localhost:3003/verify-token', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
         },
       });
-      const data = await response.json();
-      setMessages(data.messages);
+
+      console.log('User data fetched:', response.data);
+      if (response.data.user) {
+        setUserName(response.data.user.username);
+        setWithName(response.data.user.username);  // Assuming chat starts with the logged-in user
+        setReceiverType('user');  // Set receiver type to 'user'
+      } else if (response.data.healer) {
+        setUserName(response.data.healer.username);
+        setWithName(response.data.healer.username); // Assuming chat starts with the logged-in healer
+        setReceiverType('healer');  // Set receiver type to 'healer'
+      }
+
+      setError('');
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      setError('Failed to fetch user data. Please try again later.');
+    }
+  };
+
+  // Fetch previous messages from the backend using Axios
+  const fetchMessages = async () => {
+    if (!withName) {
+      setError('Recipient name is required to fetch messages.');
+      return;
+    }
+
+    try {
+      console.log(`Fetching messages with recipient: ${withName}`);
+      const response = await axios.get('http://localhost:3003/messages', {
+        params: { withName }, // Pass the recipient's name
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
+        },
+      });
+
+      console.log('Messages fetched:', response.data);
+      setMessages(response.data.messages);
+      setError('');
     } catch (error) {
       console.error('Failed to fetch messages:', error);
+      setError('Failed to fetch messages. Please try again later.');
     }
   };
 
   useEffect(() => {
+    fetchUserData();
+    fetchMessages();
+
+    // Listen for incoming messages from the server
     socket.on('message', (msg) => {
       console.log('Received message from server:', msg);
       setMessages((prevMessages) => [...prevMessages, msg]);
     });
 
-    socket.on('connectedUser', (userId) => {
-      setConnectedUser(userId);
-      if (userId) {
-        console.log('Connected to user:', userId);
-        setMessages((prevMessages) => [...prevMessages, { text: `Connected to user: ${userId}`, from: 'System' }]);
-        fetchMessages(userId, userType === 'user' ? 'healer' : 'user');
-      } else {
-        setMessages((prevMessages) => [...prevMessages, { text: 'No users available to connect', from: 'System' }]);
-      }
-    });
-
     return () => {
       socket.off('message');
-      socket.off('connectedUser');
     };
-  }, [userType]);
+  }, [withName]); // Add `withName` as a dependency to refetch messages when it changes
 
+  // Handle sending messages using Socket.IO and Axios
   const sendMessage = async () => {
     if (message.trim()) {
       console.log('Sending message:', message);
-      if (connectedUser) {
-        socket.emit('message', { text: message, to: connectedUser, from: userId });
 
-        setMessages((prevMessages) => [...prevMessages, { text: message, from: 'You' }]);
+      // Emit the message to the server using Socket.IO
+      socket.emit('message', { text: message, from: userName, to: withName, receiverType });
 
-        // Save the message to the backend
-        try {
-          const response = await fetch('http://localhost:3003/send-message', {
-            method: 'POST',
+      // Add the message to the UI immediately
+      setMessages((prevMessages) => [...prevMessages, { text: message, from: 'You' }]);
+
+      try {
+        console.log("Sending message to backend...");
+        const response = await axios.post(
+          'http://localhost:3003/send-message',
+          {
+            senderName: userName,
+            receiverName: withName,
+            messageText: message,
+            receiverType,  // Sertakan receiverType
+          },
+          {
             headers: {
-              'Content-Type': 'application/json',
               Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
             },
-            body: JSON.stringify({
-              senderType: userType, // 'user' or 'healer'
-              receiverId: connectedUser,
-              receiverType: userType === 'user' ? 'healer' : 'user', // The opposite type of the sender
-              messageText: message,
-            }),
-          });
-
-          if (!response.ok) {
-            console.error('Failed to save message:', response.statusText);
           }
-        } catch (error) {
-          console.error('Failed to send message:', error);
+        );
+
+        console.log('Message saved:', response.data);
+
+        if (response.status !== 200) {
+          console.error('Failed to save message:', response.statusText);
+          setError('Failed to save message. Please try again.');
+        } else {
+          setError('');
         }
+      } catch (error) {
+        console.error('Failed to send message:', error);
+        setError('Failed to send message. Please check your connection and try again.');
       }
+
       setMessage('');
     }
   };
 
   return (
     <ChatContainer>
+      {error && <ErrorMessage>{error}</ErrorMessage>} {/* Display error message if exists */}
       <MessagesContainer>
         {messages.map((msg, index) => (
-          <MessageBubble key={index} from={msg.from}>
-            {msg.from}: {msg.text}
+          <MessageBubble key={index} from={msg.sender_name === userName ? 'You' : msg.sender_name}>
+            {msg.sender_name === userName ? 'You' : msg.sender_name}: {msg.message_text}
           </MessageBubble>
         ))}
       </MessagesContainer>
@@ -175,3 +227,4 @@ const ChatComponent = ({ userId, userType }) => {
 };
 
 export default ChatComponent;
+

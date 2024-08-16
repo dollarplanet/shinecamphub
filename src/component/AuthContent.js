@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
+const socket = io('http://localhost:3003');
 
 export const useAuth = () => {
   return useContext(AuthContext);
@@ -10,8 +12,9 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [healer, setHealer] = useState(null); // State for healer
+  const [healer, setHealer] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('shinecampus_token');
@@ -31,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       if (decoded.exp < currentTime) {
         logout();
       } else {
-        const userType = decoded.userId ? 'user' : 'healer'; // Determine if the token belongs to a user or healer
+        const userType = decoded.userId ? 'user' : 'healer';
 
         axios.get(`http://localhost:3003/${userType}`, {
           headers: {
@@ -53,7 +56,64 @@ export const AuthProvider = ({ children }) => {
         });
       }
     }
+
+    socket.on('message', (msg) => {
+      setMessages(prevMessages => [...prevMessages, msg]);
+    });
+
+    return () => {
+      socket.off('message');
+    };
   }, []);
+
+  const sendMessage = async (receiverId, receiverType, messageText) => {
+    const senderType = user ? 'user' : 'healer';
+    const senderId = user ? user.id_user : healer.id_healer;
+
+    try {
+      const response = await axios.post('http://localhost:3003/send-message', {
+        senderType,
+        receiverId,
+        receiverType,
+        messageText,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
+        },
+      });
+
+      const newMessage = {
+        id_message: response.data.messageId,
+        sender_id: senderId,
+        sender_type: senderType,
+        receiver_id: receiverId,
+        receiver_type: receiverType,
+        message_text: messageText,
+        timestamp: new Date(),
+      };
+
+      socket.emit('message', newMessage);
+
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  };
+
+  const receiveMessages = async (withId, withType) => {
+    try {
+      const response = await axios.get('http://localhost:3003/messages', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
+        },
+        params: { withId, withType },
+      });
+
+      setMessages(response.data.messages);
+    } catch (error) {
+      console.error('Failed to retrieve messages:', error);
+    }
+  };
 
   const login = (userData) => {
     if (userData.userId) {
@@ -67,15 +127,17 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    setHealer(null); // Reset healer state
+    setHealer(null);
     setIsLoggedIn(false);
     localStorage.removeItem('shinecampus_token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, healer, isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ user, healer, isLoggedIn, login, logout, sendMessage, receiveMessages, messages }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+
 
