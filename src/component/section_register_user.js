@@ -82,14 +82,14 @@ const SectionRegister = ({ setLoggedIn, setEmail, setUserId, setRegister }) => {
       formData.append('studentProof', studentProof);
 
       try {
-        const response = await axios.post('http://localhost:3003/register', formData, {
+        const response = await axios.post('https://devservice.berkatintiguna.com/api/register', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
 
         if (response.status === 200) {
-          const loginResponse = await axios.post('http://localhost:3003/login', { email, password });
+          const loginResponse = await axios.post('https://devservice.berkatintiguna.com/api/login', { email, password });
 
           if (loginResponse.status === 200) {
             setLoggedIn(true);

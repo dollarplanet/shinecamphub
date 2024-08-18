@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
-const socket = io('http://localhost:3003');
+const socket = io('https://devservice.berkatintiguna.com/api');
 
 export const useAuth = () => {
   return useContext(AuthContext);
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         const userType = decoded.userId ? 'user' : 'healer';
 
-        axios.get(`http://localhost:3003/${userType}`, {
+        axios.get(`https://devservice.berkatintiguna.com/api/${userType}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     const senderId = user ? user.id_user : healer.id_healer;
 
     try {
-      const response = await axios.post('http://localhost:3003/send-message', {
+      const response = await axios.post('https://devservice.berkatintiguna.com/api/send-message', {
         senderType,
         receiverId,
         receiverType,
@@ -102,7 +102,7 @@ export const AuthProvider = ({ children }) => {
 
   const receiveMessages = async (withId, withType) => {
     try {
-      const response = await axios.get('http://localhost:3003/messages', {
+      const response = await axios.get('https://devservice.berkatintiguna.com/api/messages', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
         },

@@ -84,7 +84,7 @@ const SectionLogin = ({ setLoggedIn, setEmail, setUserId, setHealerId }) => {
 
     try {
       // Send login request to backend
-      const response = await axios.post('http://localhost:3003/login', { email, password });
+      const response = await axios.post('https://devservice.berkatintiguna.com/api/login', { email, password });
 
       if (response.status === 200) {
         // On successful login
