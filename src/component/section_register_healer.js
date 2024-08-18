@@ -50,7 +50,7 @@ const SectionRegister = () => {
     if (valid) {
       try {
         // Call the healer registration API endpoint
-        const response = await axios.post('https://devservice.berkatintiguna.com/api/register/healer', { username, email, password });
+        const response = await axios.post('https://api.shinecampushub.web.id/register/healer', { username, email, password });
 
         if (response.status === 200) {
           // Navigate to login page after successful registration

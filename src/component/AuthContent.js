@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
-const socket = io('https://devservice.berkatintiguna.com/api');
+const socket = io('https://api.shinecampushub.web.id');
 
 export const useAuth = () => {
   return useContext(AuthContext);
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         const userType = decoded.userId ? 'user' : 'healer';
 
-        axios.get(`https://devservice.berkatintiguna.com/api/${userType}`, {
+        axios.get(`https://api.shinecampushub.web.id/${userType}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     const senderId = user ? user.id_user : healer.id_healer;
 
     try {
-      const response = await axios.post('https://devservice.berkatintiguna.com/api/send-message', {
+      const response = await axios.post('https://api.shinecampushub.web.id/send-message', {
         senderType,
         receiverId,
         receiverType,
@@ -102,7 +102,7 @@ export const AuthProvider = ({ children }) => {
 
   const receiveMessages = async (withId, withType) => {
     try {
-      const response = await axios.get('https://devservice.berkatintiguna.com/api/messages', {
+      const response = await axios.get('https://api.shinecampushub.web.id/messages', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
         },

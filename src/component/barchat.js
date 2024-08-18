@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 
 // Initialize socket connection to the backend
-const socket = io('https://devservice.berkatintiguna.com/api'); // Adjust the URL as needed
+const socket = io('https://api.shinecampushub.web.id'); // Adjust the URL as needed
 
 // Styled components for the chat UI
 const ChatContainer = styled.div`
@@ -86,7 +86,7 @@ const ChatComponent = () => {
   const fetchUserData = async () => {
     try {
       console.log("Fetching user data...");
-      const response = await axios.get('https://devservice.berkatintiguna.com/api/verify-token', {
+      const response = await axios.get('https://api.shinecampushub.web.id/verify-token', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
         },
@@ -119,7 +119,7 @@ const ChatComponent = () => {
 
     try {
       console.log(`Fetching messages with recipient: ${withName}`);
-      const response = await axios.get('https://devservice.berkatintiguna.com/api/messages', {
+      const response = await axios.get('https://api.shinecampushub.web.id/messages', {
         params: { withName }, // Pass the recipient's name
         headers: {
           Authorization: `Bearer ${localStorage.getItem('shinecampus_token')}`,
@@ -164,7 +164,7 @@ const ChatComponent = () => {
       try {
         console.log("Sending message to backend...");
         const response = await axios.post(
-          'https://devservice.berkatintiguna.com/api/send-message',
+          'https://api.shinecampushub.web.id/send-message',
           {
             senderName: userName,
             receiverName: withName,
